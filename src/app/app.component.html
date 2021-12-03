@@ -1,23 +1,37 @@
 <div class="container">  
-   <form [formGroup]="formgroup1" (ngSubmit)="submit(this.formgroup1.value)" class="formSubmit">
+  <div class="formCss">
+    <div class="title">Welcome</div>
+  <form [formGroup]="formgroup2"  (ngSubmit)="submitLocation(this.formgroup2.value)" class="formSubmit">
+    <input type="text" formControlName="address"  placeholder="enter the district" />
+    <div class="cut"></div>
+    <button type="submit" class="submit">Submit</button>
+  </form> 
+  
+  
+  
+  <form [formGroup]="formgroup1" (ngSubmit)="submit(this.formgroup1.value)" class="formSubmit">
      
-    <input type="text" formControlName="address" />
+    <input type="text" formControlName="address"  placeholder="enter the address" />
     <label *ngIf="!getControl('address').value && getControl('address').touched">enter the address</label>
     
-    <input type="text" formControlName="pin" />
-    
-    <input type="text" formControlName="phone" />
-    
-    <button type="submit" [disabled]="checkLocalData()">Submit</button>
+    <input type="text" formControlName="pin"  placeholder="enter the pin"/>
    
+    <input type="text" formControlName="phone"   placeholder="enter the phone"/>
+    
+    <button type="submit" class="submit" [disabled]="checkLocalData()">Submit</button>
+  
   </form>
 
+</div>
+
     <div class="map">
-      <div id="map"></div>
-      <div class="calculation-box">
-        <p>Click the map to draw a polygon.</p>
-        <div id="calculated-area"></div>
+      <div id="map">
+        <div class="calculation-box">
+          <p>Click the map to draw a polygon.</p>
+          <div id="calculated-area"></div>
+        </div>
       </div>
+     
     </div>
 </div>
    

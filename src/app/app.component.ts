@@ -6,6 +6,8 @@ import * as turf from '@turf/turf'
 import { ServicesService } from 'src/services/services.service';
 import { WebData } from '../services/web-data.dto';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
+
 
 
 @Component({
@@ -16,6 +18,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class AppComponent implements OnInit {
   
   formgroup1:FormGroup;
+  formgroup2:FormGroup;
+
   constructor(private dataService: ServicesService,private fb:FormBuilder  ){
    
     this.formgroup1=this.fb.group({
@@ -23,7 +27,10 @@ export class AppComponent implements OnInit {
       pin:['',Validators.required],
       phone:['',Validators.required],
     })
-
+    
+    this.formgroup2=this.fb.group({
+      address:['',[Validators.required]],
+    })
   }
 
   getControl(control){
@@ -51,6 +58,42 @@ export class AppComponent implements OnInit {
       this.formgroup1.markAllAsTouched();
     }
    }
+
+
+   submitLocation(value){
+
+     this.dataService.postLocation(value).subscribe(y=>{
+        this.lat=y.message.longitude;
+        this.log=y.message.latitude;
+      
+        let timerInterval
+        Swal.fire({
+          title: 'plz wait for mapo to load!',
+          html: ' <b></b> milliseconds.',
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b:any = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+        }).then((result) => {
+          /* Read more about handling dismissals below */
+          if (result.dismiss === Swal.DismissReason.timer) {
+            console.log('I was closed by the timer')
+          }
+        })
+        this.ngOnInit();
+        // this.formgroup1.reset();
+       },err=>{
+    console.log(err);
+      })
+    }
    
    checkLocalData(){
          if(!localStorage.getItem('coordinates')){
@@ -58,16 +101,17 @@ export class AppComponent implements OnInit {
          }
          else {
            return false;
-         }
+         } 
    }
 
    lat=77.2664587;
-  log=28.5366411
-  ngOnInit(){
-
+   log=28.5366411
+  
+   ngOnInit(){
+     console.log("testing",this.lat,this.log)
     localStorage.clear();
     Object.getOwnPropertyDescriptor(mapboxgl, "accessToken").set(environment.mapboxkey);
-    // mapboxgl.accessToken = 'pk.eyJ1IjoidGVzdGluZ2FsbW9uZHoiLCJhIjoiY2t3ZzZlYnlwMGxlcTJ1cXZ3cDM1ZDZ5ZCJ9.LTpVQRAL-OhcTw1lgQlgJg';
+  
     const map = new mapboxgl.Map({
         container: 'map', // container ID
         style: 'mapbox://styles/mapbox/streets-v11', // style URL
@@ -98,12 +142,8 @@ export class AppComponent implements OnInit {
      
       const data:any = draw.getAll();
       let polyCoord = turf.coordAll(data);
-      // console.log("hello",polyCoord);
-      // let newData=localStorage.setItem('coordinates',JSON.stringify(polyCoord));
+   
       localStorage.setItem('coordinates',JSON.stringify(polyCoord));
-      // let data1=JSON.parse(localStorage.getItem('coordinates'));
-      // console.log("new data",data1);
-
       const answer = document.getElementById('calculated-area');
       if (data.features.length > 0) {
           const area = turf.area(data);
@@ -113,12 +153,6 @@ export class AppComponent implements OnInit {
           const rounded_area = Math.round(area * 100) / 100;
           answer.innerHTML = `<p><strong>Centroid: <br />
           ${centroid.geometry.coordinates[1]},${centroid.geometry.coordinates[0]}</strong></p>`;
-         
-       
-         
-        //  console.log("corrdinates data",coordinatesData);
-        
-        
      
     }
      

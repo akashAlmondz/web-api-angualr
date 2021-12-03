@@ -23,4 +23,9 @@ export class ServicesService  {
     console.log("values of coordinates",data);
     return this.http.post<WebData>(`${this.authLink}/data`,data);
   }
+
+  postLocation(data:any):Observable<any>{
+    console.log("address",data);
+    return this.http.post<any>(`${this.authLink}/data/getLocation`,data);
+  }
 }
